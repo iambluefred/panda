@@ -312,12 +312,12 @@ static int honda_tx_hook(CAN_FIFOMailBox_TypeDef *to_send) {
 
 static void honda_nidec_init(int16_t param) {
   UNUSED(param);
-  controls_allowed = false;
+  controls_allowed = true;
   relay_malfunction_reset();
   gas_interceptor_detected = 0;
   honda_hw = HONDA_N_HW;
-  honda_alt_brake_msg = false;
-  honda_bosch_long = false;
+  honda_alt_brake_msg = true;
+  honda_bosch_long = true;
 }
 
 static void honda_bosch_giraffe_init(int16_t param) {
@@ -348,7 +348,7 @@ static int honda_nidec_fwd_hook(int bus_num, CAN_FIFOMailBox_TypeDef *to_fwd) {
 
   if (!relay_malfunction) {
     if (bus_num == 0) {
-      bus_fwd = 2;
+      bus_fwd = -1;
     }
     if (bus_num == 2) {
       // block stock lkas messages and stock acc messages (if OP is doing ACC)
@@ -358,7 +358,7 @@ static int honda_nidec_fwd_hook(int bus_num, CAN_FIFOMailBox_TypeDef *to_fwd) {
       bool is_brake_msg = addr == 0x1FA;
       bool block_fwd = is_lkas_msg || is_acc_hud_msg || (is_brake_msg && !honda_fwd_brake);
       if (!block_fwd) {
-        bus_fwd = 0;
+        bus_fwd = -1;
       }
     }
   }
